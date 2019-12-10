@@ -94,12 +94,8 @@ int str_backupSystem(char* filepath) { //현재 보관함들의 상태 및 설정 값들을 파�
 		for (i = 0;i < systemSize[0];i++) {
 			for (j = 0;j < systemSize[1];j++) {
 				if (deliverySystem[i][j].cnt == 1) {
-					fputc(i,fp);
-					fputc(j, fp);
-					fputc((char)deliverySystem[i][j].building, fp);
-					fputc((char)deliverySystem[i][j].room, fp);
-					fputs(deliverySystem[i][j].passwd, fp);
-					fputs(deliverySystem[i][j].context, fp);
+					
+					fprintf(fp,"%d %d %d %d %s %s",i,j,deliverySystem[i][j].building,deliverySystem[i][j].room,deliverySystem[i][j].passwd,deliverySystem[i][j].context);
 				}
 			}
 		}
@@ -133,11 +129,12 @@ int str_createSystem(char* filepath) { //택배보관함 구조체 자료구조 생성
 	int inputrow, inputcolumn;
 		
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
+	
+	fscanf(fp, "%d %d %s", &systemSize[0], &systemSize[1], masterPassword);
+	
 	for(i=0;i<systemSize[0];i++) {
 		deliverySystem[i]= (storage_t*)malloc(systemSize[1]*sizeof(storage_t));
 	}
-	
-	fscanf(fp, "%d %d %s", &systemSize[0], &systemSize[1], masterPassword);
 	
 	for(i=0;i<systemSize[0];i++) {
 		for(j=0;j<systemSize[1];j++)
@@ -145,44 +142,19 @@ int str_createSystem(char* filepath) { //택배보관함 구조체 자료구조 생성
 	}
 	
 	while(fscanf(fp, "%d %d", &inputrow, &inputcolumn)==2){
+		
 		fscanf(fp, "%d %d %s %s", &deliverySystem[inputrow][inputcolumn].building, &deliverySystem[inputrow][inputcolumn].room,
-		 &deliverySystem[inputrow][inputcolumn].room, deliverySystem[inputrow][inputcolumn].passwd, deliverySystem[i][j].context);
-		printf("%d %d %s %d %d %d %d %s %s", systemSize[0], systemSize[1], masterPassword, inputrow, inputcolumn, 
-		deliverySystem[inputrow][inputcolumn].building, deliverySystem[inputrow][inputcolumn].room, 
-		deliverySystem[inputrow][inputcolumn].passwd,  deliverySystem[i][j].context);
+		 &deliverySystem[inputrow][inputcolumn].room, deliverySystem[inputrow][inputcolumn].passwd, deliverySystem[inputrow][inputcolumn].context);
+		
 	}
 	
+
 	fclose(fp);
 	return 0;	
 		
-		
-	
 }
 
-/*
-		systemSize[0] = 4;
-		systemSize[1] = 6;
 
-		*masterPassword = "1234";
-
-		//셋째줄부터
-		int x; int y; int building; int room; char passwd[10]; char context[100];
-		fscanf(fp, "%d %d %d %d %s %s", &x, &y, &building, &room, passwd, context);
-		deliverySystem[x][y].cnt=1;
-		deliverySystem[x][y].building = building;
-		deliverySystem[x][y].room = room;
-		deliverySystem[x][y].context = context;
-		*deliverySystem[x][y].passwd = passwd;
-
-		storage_t ** deliverySystem;
-		deliverySystem = (storage_t**)malloc(24 * sizeof(struct deliverySystem*)); //공간 마련
-		int i; int j;
-		for (i = 0;i < systemSize[0];i++) {
-			for (j = 0;j < systemSize[1];j++) {
-				initStorage(i, j);
-			}
-		}
-		return 0;*/
 
 //free the memory of the deliverySystem 
 void str_freeSystem(void) {
