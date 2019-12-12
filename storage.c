@@ -23,7 +23,7 @@ typedef struct {
 
 static storage_t** deliverySystem; 			//deliverySystem
 static int storedCnt = 0;					//number of cells occupied 차있는 칸수
-static int systemSize[2] = { 0, 0 };  		//row/column of the delivery system
+static int systemSize[2] = {0,0 };  		//row/column of the delivery system
 static char masterPassword[PASSWD_LEN + 1];	//master password
 
 
@@ -94,7 +94,6 @@ int str_backupSystem(char* filepath) { //현재 보관함들의 상태 및 설정 값들을 파�
 		for (i = 0;i < systemSize[0];i++) {
 			for (j = 0;j < systemSize[1];j++) {
 				if (deliverySystem[i][j].cnt == 1) {
-					
 					fprintf(fp,"%d %d %d %d %s %s",i,j,deliverySystem[i][j].building,deliverySystem[i][j].room,deliverySystem[i][j].passwd,deliverySystem[i][j].context);
 				}
 			}
@@ -110,48 +109,57 @@ int str_backupSystem(char* filepath) { //현재 보관함들의 상태 및 설정 값들을 파�
 //create delivery system on the double pointer deliverySystem
 //char* filepath : filepath and name to read config parameters (row, column, master password, past contexts of the delivery system
 //return : 0 - successfully created, -1 - failed to create the system
-
-int str_createSystem(char* filepath) { //택배보관함 구조체 자료구조 생성
-	
+int str_createSystem(char* filepath) 
+{
 	//make file NULL
-	FILE *fp=NULL;
-	int line = 0;
+	FILE *fp = NULL;
+	fp=fopen(filepath, "r");
 	char c;
-	fp = fopen(filepath, "r"); 
+	//check open&close: FILE *fopen(STORAGE_FILEPATH, "r");
 	
 	if (fp == NULL)
+	{
 		return -1;
-		
+	}
 	//malloc
-	
-	//file에서 행,열,마스터비번, 사물함 상황들 read해야함.
-	int i,j;
+	int i, j;
+	//apply the locker's column&row
 	int inputrow, inputcolumn;
-		
-	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
-	
 	fscanf(fp, "%d %d %s", &systemSize[0], &systemSize[1], masterPassword);
 	
+	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	for(i=0;i<systemSize[0];i++) {
-		deliverySystem[i]= (storage_t*)malloc(systemSize[1]*sizeof(storage_t));
+			deliverySystem[i] =(storage_t*) malloc(systemSize[1]*sizeof(storage_t));
 	}
+	
 	
 	for(i=0;i<systemSize[0];i++) {
 		for(j=0;j<systemSize[1];j++)
-			deliverySystem[i][j].context = (char *)malloc(100 * sizeof(char));
+			deliverySystem[i][j].context = (char *)malloc(MAX_MSG_SIZE * sizeof(char ));
 	}
 	
+	//row col building room pswd context
 	while(fscanf(fp, "%d %d", &inputrow, &inputcolumn)==2){
-		
-		fscanf(fp, "%d %d %s %s", &deliverySystem[inputrow][inputcolumn].building, &deliverySystem[inputrow][inputcolumn].room,
-		 &deliverySystem[inputrow][inputcolumn].room, deliverySystem[inputrow][inputcolumn].passwd, deliverySystem[inputrow][inputcolumn].context);
-		
+		fscanf(fp, "%d %d %s %s", &deliverySystem[inputrow][inputcolumn].building, 
+		&deliverySystem[inputrow][inputcolumn].room, deliverySystem[inputrow][inputcolumn].passwd,
+		 deliverySystem[inputrow][inputcolumn].context);
+		 
+		 
+		/*printf("%d %d %s %d %d %d %d %s %s", systemSize[0], systemSize[1], masterPassword, inputrow, inputcolumn, 
+		deliverySystem[inputrow][inputcolumn].building, deliverySystem[inputrow][inputcolumn].room, 
+		deliverySystem[inputrow][inputcolumn].passwd, deliverySystem[inputrow][inputcolumn].context);*/
 	}
 	
-
 	fclose(fp);
-	return 0;	
-		
+	int p; int q;
+	for (p=0;p<systemSize[0];p++){
+		for (q=0;q<systemSize[1];q++){
+			if ((int)deliverySystem[p][q].building)>0 && ((int)deliverySystem[i][j]<N_BUILDING)){//p,q가 존재하면!  
+				deliverySystem[p][q].cnt=0;
+			}
+		}
+	} 
+	return 0;
 }
 
 
@@ -173,7 +181,7 @@ void str_printStorageStatus(void) {
 	printf("----------------------------- Delivery Storage System Status (%i occupied out of %i )-----------------------------\n\n", storedCnt, systemSize[0] * systemSize[1]);
 
 	printf("\t");
-	for (j = 0;j<systemSize[1];j++)
+	for (j = 0;j<systemSize[0];j++)
 	{
 		printf(" %i\t\t", j);
 	}
