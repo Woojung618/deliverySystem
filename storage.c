@@ -90,20 +90,24 @@ int str_backupSystem(char* filepath) { //현재 보관함들의 상태 및 설정 값들을 파�
 		return -1;
 	
 	else {
+		fprintf(fp,"%d %d\n",systemSize[0],systemSize[1]);
+		fprintf(fp,"%s\n",masterPassword);
 		int i; int j;
 		for (i = 0;i < systemSize[0];i++) {
 			for (j = 0;j < systemSize[1];j++) {
 				if (deliverySystem[i][j].cnt == 1) {
 					fprintf(fp,"%d %d %d %d %s %s",i,j,deliverySystem[i][j].building,deliverySystem[i][j].room,deliverySystem[i][j].passwd,deliverySystem[i][j].context);
+					fprintf(fp,"\n");
+					//printf("%d %d %d %d %s %s",i,j,deliverySystem[i][j].building,deliverySystem[i][j].room,deliverySystem[i][j].passwd,deliverySystem[i][j].context);
+				
 				}
 			}
 		}
-
+		fclose(fp);
 		return 0;
 	}
-	fclose(fp);
+	
 }
-
 
 
 //create delivery system on the double pointer deliverySystem
@@ -156,10 +160,8 @@ int str_createSystem(char* filepath)
 	}
 	
 	fclose(fp);
-	
 	return 0;
 }
-
 
 
 //free the memory of the deliverySystem 
@@ -172,14 +174,13 @@ void str_freeSystem(void) {
 }
 
 
-
 //print the current state of the whole delivery system (which cells are occupied and the destination of the each occupied cells)
 void str_printStorageStatus(void) {
 	int i, j;
 	printf("----------------------------- Delivery Storage System Status (%i occupied out of %i )-----------------------------\n\n", storedCnt, systemSize[0] * systemSize[1]);
 
 	printf("\t");
-	for (j = 0;j<systemSize[0];j++)
+	for (j = 0;j<6;j++)
 	{
 		printf(" %i\t\t", j);
 	}
@@ -259,7 +260,7 @@ int str_extractStorage(int x, int y) {
 		printf("\n------------------------------------------------------------------------\n");
 		printf("\n------------------------------------------------------------------------\n\n");
 
-		initStorage(x, y);
+		//initStorage(x, y);
 		return 0;
 	}
 	else {
@@ -278,7 +279,7 @@ int str_findStorage(int nBuilding, int nRoom) {
 	for (i = 0;i < systemSize[0];i++) {
 		for (j = 0;j < systemSize[1];j++) {
 			if (deliverySystem[i][j].building == nBuilding) {
-				if (deliverySystem[i][j].room = nRoom) {
+				if (deliverySystem[i][j].room == nRoom) {
 					printf("-----------> Found a package in (%d, %d)", i, j);
 					returnCnt++;
 				}
