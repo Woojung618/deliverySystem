@@ -118,14 +118,16 @@ int str_createSystem(char* filepath)
 	//check open&close: FILE *fopen(STORAGE_FILEPATH, "r");
 	
 	if (fp == NULL)
-	{
 		return -1;
-	}
+	
 	//malloc
 	int i, j;
+	
 	//apply the locker's column&row
 	int inputrow, inputcolumn;
 	fscanf(fp, "%d %d %s", &systemSize[0], &systemSize[1], masterPassword);
+	
+
 	
 	deliverySystem = (storage_t**)malloc(systemSize[0]*sizeof(storage_t*));
 	for(i=0;i<systemSize[0];i++) {
@@ -137,28 +139,24 @@ int str_createSystem(char* filepath)
 		for(j=0;j<systemSize[1];j++)
 			deliverySystem[i][j].context = (char *)malloc(MAX_MSG_SIZE * sizeof(char ));
 	}
-	
+		//cnt 모두 0으로  
+	for (i=0;i<systemSize[0];i++){
+		for (j=0;j<systemSize[1];j++){
+			//initStorage(i,j);
+			deliverySystem[i][j].cnt=0;
+		}
+	}
 	//row col building room pswd context
 	while(fscanf(fp, "%d %d", &inputrow, &inputcolumn)==2){
 		fscanf(fp, "%d %d %s %s", &deliverySystem[inputrow][inputcolumn].building, 
 		&deliverySystem[inputrow][inputcolumn].room, deliverySystem[inputrow][inputcolumn].passwd,
 		 deliverySystem[inputrow][inputcolumn].context);
+		deliverySystem[inputrow][inputcolumn].cnt=1;
 		 
-		 
-		/*printf("%d %d %s %d %d %d %d %s %s", systemSize[0], systemSize[1], masterPassword, inputrow, inputcolumn, 
-		deliverySystem[inputrow][inputcolumn].building, deliverySystem[inputrow][inputcolumn].room, 
-		deliverySystem[inputrow][inputcolumn].passwd, deliverySystem[inputrow][inputcolumn].context);*/
 	}
 	
 	fclose(fp);
-	int p; int q;
-	for (p=0;p<systemSize[0];p++){
-		for (q=0;q<systemSize[1];q++){
-			if ((int)deliverySystem[p][q].building)>0 && ((int)deliverySystem[i][j]<N_BUILDING)){//p,q가 존재하면!  
-				deliverySystem[p][q].cnt=0;
-			}
-		}
-	} 
+	
 	return 0;
 }
 
@@ -231,7 +229,7 @@ int str_checkStorage(int x, int y) {
 //char passwd[] : password string (4 characters)
 //return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE + 1], char passwd[PASSWD_LEN + 1]) {
-	//xy값 따져서 
+
 	if (x > 3 || x < 0 || y < 0 || y>5)
 		return -1;
 	else {
